@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start:scaled": "pm2 start server.js -i 0",
+    "terminate:all": "pm2 delete server"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@socket.io/pm2": "^5.3.0",
     "dotenv": "^16.0.3",
     "mongoose": "^5.12.4",
     "socket.io": "^4.0.1"
