@@ -8,7 +8,7 @@ const multer = require('multer')
 const path = require('path')
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.FE_BASE_url,
   methods: ['GET', 'POST']
 }))
 app.use(express.static(path.join(__dirname, 'images')))
@@ -50,7 +50,7 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: process.env.FE_BASE_url,
     methods: ['GET', 'POST']
   }
 });
@@ -69,7 +69,6 @@ io.on("connection", socket => {
     socket.emit("load-document", document.data)
 
     socket.on("send-changes", delta => {
-      console.log('###### delta: ', delta);
       socket.broadcast.to(documentId).emit("receive-changes", delta)
     })
 

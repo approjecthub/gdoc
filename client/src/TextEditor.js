@@ -24,7 +24,7 @@ export default function TextEditor() {
   const [quill, setQuill] = useState(null);
 
   useEffect(() => {
-    const s = io("http://localhost:3001/");
+    const s = io(process.env.REACT_APP_BE_URL);
     setSocket(s);
 
     return () => {
@@ -130,7 +130,7 @@ export default function TextEditor() {
         };
         try {
           const uploadResponse = await fetch(
-            "http://localhost:3001/media",
+            `${process.env.REACT_APP_BE_URL}/media`,
             requestOptions
           ).then((response) => response.json());
           const delta = q.insertEmbed(
