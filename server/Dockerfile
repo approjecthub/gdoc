@@ -7,9 +7,9 @@ RUN npm i
 
 # Need to replace running the container
 ENV DB_url=mongodb://localhost:27017 \
-    FE_BASE_url=http://localhost:3000 \
-    PORT=3001
-
+    PORT=3001 \
+    NODE_ENV=development\
+    FE_PORT_LOCAL=3000
 
 EXPOSE ${PORT}
 
