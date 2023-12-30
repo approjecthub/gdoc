@@ -1,0 +1,17 @@
+name: Docker Image CI for GHCR
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build & publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build and push the image
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          docker login --username approjecthub --password ${{secrets.gdoc_key}} ghcr.io
+          docker build ./server -t ghcr.io/approjecthub/gdoc_server:${VERSION}
+          docker push ghcr.io/approjecthub/gdoc_server:${VERSION}
