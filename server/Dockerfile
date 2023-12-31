@@ -4,6 +4,7 @@ WORKDIR /home/app/server
 
 COPY . .
 RUN npm i
+RUN mkdir images
 
 # Need to replace running the container
 ENV DB_url=mongodb://localhost:27017 \
