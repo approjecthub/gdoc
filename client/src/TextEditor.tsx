@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import Quill from "quill";
+import Quill, { Sources } from "quill";
+import Delta from "quill/node_modules/quill-delta";
 import "quill/dist/quill.snow.css";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { useParams } from "react-router-dom";
 
 const TOOLBAR_OPTIONS = [
@@ -17,14 +18,14 @@ const TOOLBAR_OPTIONS = [
 ];
 
 export default function TextEditor() {
-  const { id: documentId } = useParams();
-  const container = useRef(null);
+  const { id: documentId } = useParams<{ id: string }>();
+  const container = useRef<HTMLDivElement>(null);
   const [isQuillEnabled, setIsQuillEnabled] = useState(false);
-  const [socket, setSocket] = useState(null);
-  const [quill, setQuill] = useState(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [quill, setQuill] = useState<Quill | null>(null);
 
   useEffect(() => {
-    const s = io(process.env.REACT_APP_BE_URL);
+    const s = io(process.env.REACT_APP_BE_URL!);
     setSocket(s);
 
     return () => {
@@ -35,7 +36,7 @@ export default function TextEditor() {
   useEffect(() => {
     if (!socket || !quill) return;
 
-    const saveHandler = (e) => {
+    const saveHandler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.keyCode === "S".charCodeAt(0)) {
         e.preventDefault();
         socket.emit("save-document", quill.getContents());
@@ -71,7 +72,7 @@ export default function TextEditor() {
   useEffect(() => {
     if (!socket || !quill) return;
 
-    const handler = (delta, oldData, source) => {
+    const handler = (delta: Delta, _: Delta, source: Sources) => {
       if (source !== "user") return;
       socket.emit("send-changes", delta);
     };
@@ -85,7 +86,7 @@ export default function TextEditor() {
   useEffect(() => {
     if (!socket || !quill) return;
 
-    const handler = (delta) => {
+    const handler = (delta: Delta) => {
       quill.updateContents(delta);
     };
     socket.on("receive-changes", handler);
@@ -118,12 +119,12 @@ export default function TextEditor() {
       input.click();
 
       input.onchange = async () => {
-        var file = input.files[0];
+        var file = input.files?.[0];
         var formData = new FormData();
 
-        formData.append("image", file, file.name);
+        formData.append("image", file!, file?.name);
 
-        const requestOptions = {
+        const requestOptions: RequestInit = {
           method: "POST",
           body: formData,
           redirect: "follow",
@@ -134,7 +135,7 @@ export default function TextEditor() {
             requestOptions
           ).then((response) => response.json());
           const delta = q.insertEmbed(
-            q.getSelection().index,
+            q.getSelection()!.index,
             "image",
             uploadResponse?.imagePath
           );
