@@ -1,4 +1,4 @@
 node_modules
 .env
 server/images/*
-client/build/*
+*/build/*
