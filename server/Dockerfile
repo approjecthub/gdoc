@@ -14,4 +14,7 @@ ENV DB_url=mongodb://localhost:27017 \
 
 EXPOSE ${PORT}
 
-CMD ["node", "server.js"]
+RUN npm run build
+RUN mkdir build/images
+
+CMD ["npm", "run", "start"]

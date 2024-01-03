@@ -1,11 +1,14 @@
 require("dotenv").config();
-const gDocument = require("./gDocument");
-const mongoose = require("mongoose");
-const express = require("express");
-const cors = require("cors");
+import gDocument from "./gDocument";
+import mongoose from "mongoose";
+import express from "express";
+import cors from "cors";
+import path from "path";
+import multer from "multer";
+import http from "http";
+import { Server } from "socket.io";
+
 const app = express();
-const multer = require("multer");
-const path = require("path");
 
 app.use(
   cors({
@@ -19,22 +22,22 @@ app.use(
 );
 app.use(express.static(path.join(__dirname, "images")));
 
-const MIME_type_mp = {
+const MIME_type_mp: { [key: string]: string } = {
   "image/png": "png",
   "image/jpeg": "jpg",
   "image/jpg": "jpg",
 };
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
+  destination: (_, file, cb) => {
     let isValid = MIME_type_mp[file.mimetype];
-    let error = new Error("file mime type not valid");
+    let error: Error | null = new Error("file mime type not valid");
     if (isValid) {
       error = null;
     }
     cb(error, path.join(__dirname, "images"));
   },
-  filename: (req, file, cb) => {
+  filename: (_, file, cb) => {
     const name = file.originalname.split(" ").join("-");
     const ext = MIME_type_mp[file.mimetype];
     cb(null, name + "-" + Date.now() + "." + ext);
@@ -51,16 +54,14 @@ app.post(
   async (req, res) => {
     const url = req.protocol + "://" + req.get("host");
     try {
-      res.status(201).send({ imagePath: url + "/" + req.file.filename });
-    } catch (err) {
+      res.status(201).send({ imagePath: url + "/" + req.file?.filename });
+    } catch (err: any) {
       res.status(400).send(err.message);
     }
   }
 );
 
-const http = require("http");
 const server = http.createServer(app);
-const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
     origin: [
@@ -72,7 +73,7 @@ const io = new Server(server, {
   },
 });
 
-mongoose.connect(process.env.DB_url, {
+mongoose.connect(process.env.DB_url!, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
@@ -95,7 +96,7 @@ io.on("connection", (socket) => {
   });
 });
 
-async function findOrCreateGDocument(id) {
+async function findOrCreateGDocument(id: string) {
   if (id === null) return null;
 
   const document = await gDocument.findById(id);
