@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Quill, { Sources } from "quill";
-import Delta from "quill/node_modules/quill-delta";
+import Delta from "quill-delta";
 import "quill/dist/quill.snow.css";
 import { io, Socket } from "socket.io-client";
 import { useParams } from "react-router-dom";
